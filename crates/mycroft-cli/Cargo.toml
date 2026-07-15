@@ -1,0 +1,25 @@
+[package]
+name = "mycroft-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "The `mycroft` binary: init, scope, run, import, report, verify + TUI."
+
+[[bin]]
+name = "mycroft"
+path = "src/main.rs"
+
+[dependencies]
+mycroft-core = { workspace = true }
+mycroft-store = { workspace = true }
+mycroft-guard = { workspace = true }
+mycroft-runner = { workspace = true }
+mycroft-normalize = { workspace = true }
+mycroft-report = { workspace = true }
+mycroft-tui = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+time = { workspace = true }
+tokio = { workspace = true }

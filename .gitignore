@@ -1,0 +1,23 @@
+/target
+**/*.rs.bk
+Cargo.lock.orig
+
+# Engagement artifacts must never be committed (local-first invariant §4)
+*.db
+*.db-wal
+*.db-shm
+/engagements/
+*.sqlite
+*.sqlite3
+
+# Generated reports & evidence
+/out/
+*.pdf
+/evidence/
+
+# Fuzzing
+/crates/*/fuzz/target/
+/crates/*/fuzz/corpus/
+/crates/*/fuzz/artifacts/
+
+.DS_Store

@@ -1,0 +1,7 @@
+{"template-id":"tech-detect","info":{"name":"Nginx Detection","severity":"info","description":"Detected nginx web server."},"host":"scanme.example.org","matched-at":"http://scanme.example.org","type":"http"}
+this line is not valid json and must be skipped
+{"template-id":"CVE-2021-44228","info":{"name":"Apache Log4j RCE (Log4Shell)","severity":"critical","description":"Remote code execution via JNDI lookup."},"host":"scanme.example.org","matched-at":"https://scanme.example.org/api","type":"http"}
+{"template-id":"weak-cipher","info":{"name":"TLS Weak Cipher","severity":"medium"},"matched-at":"scanme.example.org:443","type":"ssl"}
+{"template-id":"no-info-record","host":"scanme.example.org","matched-at":"http://scanme.example.org/x"}
+
+{"template-id":"unknown-sev","info":{"name":"Odd Severity","severity":"totally-made-up"},"matched-at":"scanme.example.org"}

@@ -1,0 +1,28 @@
+[package]
+name = "mycroft-store"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Mycroft persistence: schema, migrations, typed repositories, audit chain."
+
+[features]
+default = []
+# Encrypt the engagement DB at rest via SQLCipher. Off by default (CLAUDE.md §6).
+# When enabled, `Db::open` with a key runs `PRAGMA key`; the sqlcipher backend makes
+# it effective. On stock SQLite the pragma is an inert no-op, so the API seam is stable.
+encryption = ["rusqlite/bundled-sqlcipher"]
+
+[dependencies]
+mycroft-core = { workspace = true }
+rusqlite = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+thiserror = { workspace = true }
+time = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"

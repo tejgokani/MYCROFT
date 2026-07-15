@@ -1,0 +1,18 @@
+[package]
+name = "mycroft-tui"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "ratatui screens: scope, runner, findings panes (and AI pane in v1)."
+
+[dependencies]
+mycroft-core = { workspace = true }
+mycroft-store = { workspace = true }
+mycroft-guard = { workspace = true }
+mycroft-runner = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+ratatui = "0.29"
+crossterm = "0.28"

@@ -1,0 +1,21 @@
+[package]
+name = "mycroft-runner"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Command runner: guarded exec, dual capture (machine + PTY), persistence."
+
+[dependencies]
+mycroft-core = { workspace = true }
+mycroft-store = { workspace = true }
+mycroft-guard = { workspace = true }
+mycroft-normalize = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
