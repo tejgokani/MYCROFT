@@ -568,7 +568,7 @@ dependencies = [
 
 [[package]]
 name = "mycroft"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -585,7 +585,7 @@ dependencies = [
 
 [[package]]
 name = "mycroft-core"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -596,7 +596,7 @@ dependencies = [
 
 [[package]]
 name = "mycroft-guard"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "ipnet",
  "mycroft-core",
@@ -605,7 +605,7 @@ dependencies = [
 
 [[package]]
 name = "mycroft-normalize"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "mycroft-core",
  "roxmltree",
@@ -616,7 +616,7 @@ dependencies = [
 
 [[package]]
 name = "mycroft-report"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "mycroft-core",
@@ -626,7 +626,7 @@ dependencies = [
 
 [[package]]
 name = "mycroft-runner"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "hex",
@@ -641,7 +641,7 @@ dependencies = [
 
 [[package]]
 name = "mycroft-store"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "hex",
  "mycroft-core",
@@ -656,7 +656,7 @@ dependencies = [
 
 [[package]]
 name = "mycroft-tui"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "crossterm",

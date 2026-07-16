@@ -12,7 +12,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 rust-version = "1.82"
 license = "Apache-2.0"
@@ -24,13 +24,13 @@ categories = ["command-line-utilities"]
 
 [workspace.dependencies]
 # Internal crates (path for local builds; version required so they are publishable to crates.io)
-mycroft-core = { path = "crates/mycroft-core", version = "0.0.1" }
-mycroft-store = { path = "crates/mycroft-store", version = "0.0.1" }
-mycroft-guard = { path = "crates/mycroft-guard", version = "0.0.1" }
-mycroft-runner = { path = "crates/mycroft-runner", version = "0.0.1" }
-mycroft-normalize = { path = "crates/mycroft-normalize", version = "0.0.1" }
-mycroft-report = { path = "crates/mycroft-report", version = "0.0.1" }
-mycroft-tui = { path = "crates/mycroft-tui", version = "0.0.1" }
+mycroft-core = { path = "crates/mycroft-core", version = "0.1.0" }
+mycroft-store = { path = "crates/mycroft-store", version = "0.1.0" }
+mycroft-guard = { path = "crates/mycroft-guard", version = "0.1.0" }
+mycroft-runner = { path = "crates/mycroft-runner", version = "0.1.0" }
+mycroft-normalize = { path = "crates/mycroft-normalize", version = "0.1.0" }
+mycroft-report = { path = "crates/mycroft-report", version = "0.1.0" }
+mycroft-tui = { path = "crates/mycroft-tui", version = "0.1.0" }
 
 # Shared external deps (pinned at workspace level; see docs/DECISIONS.md for rationale)
 anyhow = "1"
