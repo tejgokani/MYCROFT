@@ -38,7 +38,7 @@ curl --proto '=https' --tlsv1.2 -LsSf \
   https://raw.githubusercontent.com/tejgokani/MYCROFT/main/install.sh | sh
 ```
 
-## 3. Publish to crates.io (`cargo install mycroft`)
+## 3. Publish to crates.io (`cargo install mycroft-cli`)
 
 Publishing is **manual and irreversible** — it requires your crates.io token and is
 not done by CI. The workspace is publish-ready (every internal dependency carries a
@@ -53,13 +53,23 @@ cargo publish -p mycroft-normalize
 cargo publish -p mycroft-runner
 cargo publish -p mycroft-report
 cargo publish -p mycroft-tui
-cargo publish -p mycroft        # the binary crate -> `cargo install mycroft`
+cargo publish -p mycroft-cli     # the binary crate -> installs the `mycroft` binary
 ```
 
-> **Name availability:** the binary crate is named `mycroft`. If that name is already
-> taken on crates.io, rename the `[package] name` in `crates/mycroft-cli/Cargo.toml`
-> (e.g. to `mycroft-console`) — the binary stays `mycroft`, and `cargo install`
-> targets the crate name instead.
+> **Name note:** the crate name `mycroft` is already taken on crates.io (an unrelated
+> 2018 project), so the binary crate publishes as **`mycroft-cli`** and users run
+> `cargo install mycroft-cli`. The installed executable is still `mycroft`.
+>
+> **New-crate rate limit:** crates.io throttles publishing *new* crate names (a small
+> burst, then a cooldown of several hours). Publishing all eight at once will 429
+> partway through with a "try again after <time>" message — just re-run the remaining
+> `cargo publish` commands after that time. Already-published crates are skipped.
+
+### Current publish state (v0.1.0)
+
+Published: `mycroft-core`, `mycroft-store`, `mycroft-guard`, `mycroft-normalize`,
+`mycroft-runner`. Remaining (blocked by the new-crate rate limit): `mycroft-report`,
+`mycroft-tui`, `mycroft-cli` — publish these after the cooldown.
 
 ## 4. Homebrew tap
 

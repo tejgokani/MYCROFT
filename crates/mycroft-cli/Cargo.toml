@@ -1,5 +1,7 @@
 [package]
-name = "mycroft"
+# The crate name `mycroft` is taken on crates.io (an unrelated 2018 project), so the
+# binary crate publishes as `mycroft-cli`. The installed executable is still `mycroft`.
+name = "mycroft-cli"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

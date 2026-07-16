@@ -57,7 +57,7 @@ separately for whatever you scan. `typst` is optional, for PDF reports.
 **From source** (needs a recent [Rust](https://rustup.rs) toolchain — works today):
 
 ```sh
-cargo install --git https://github.com/tejgokani/MYCROFT mycroft
+cargo install --git https://github.com/tejgokani/MYCROFT mycroft-cli
 # or clone and build
 git clone https://github.com/tejgokani/MYCROFT && cd MYCROFT && cargo build --release
 ```
@@ -70,7 +70,7 @@ curl --proto '=https' --tlsv1.2 -LsSf \
   https://raw.githubusercontent.com/tejgokani/MYCROFT/main/install.sh | sh
 
 brew install tejgokani/mycroft/mycroft   # Homebrew
-cargo install mycroft                     # crates.io
+cargo install mycroft-cli                 # crates.io (installs the `mycroft` binary)
 ```
 
 Prebuilt archives for macOS (arm64/x64), Linux (x64/arm64), and Windows are attached to
