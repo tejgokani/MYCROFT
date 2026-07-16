@@ -43,8 +43,10 @@ report with an evidence appendix.
 
 ## Demo
 
-The quickstart below is scripted as a [VHS](https://github.com/charmbracelet/vhs) tape at
-[`docs/demo.tape`](docs/demo.tape). Run `vhs docs/demo.tape` to generate `docs/demo.gif`.
+![Mycroft demo](docs/demo.gif)
+
+Scripted as a [VHS](https://github.com/charmbracelet/vhs) tape at
+[`docs/demo.tape`](docs/demo.tape); regenerate with `vhs docs/demo.tape`.
 
 ## Install
 
