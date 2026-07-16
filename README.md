@@ -1,150 +1,192 @@
+<div align="center">
+
 # Mycroft
 
-> The operating system for a pentest engagement — recon to report, one console.
+**The operating system for a pentest engagement — recon to report, one console.**
 
-Mycroft is a terminal-native **engagement console**. Define your scope once and the tool
-guards it; run every tool *through* Mycroft and every command is auto-logged, timestamped,
-and captured; all output normalizes into one findings database; and one command produces a
-client-ready report with an evidence appendix. Local-first: client data never leaves the box.
+[![CI](https://github.com/tejgokani/MYCROFT/actions/workflows/ci.yml/badge.svg)](https://github.com/tejgokani/MYCROFT/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Rust](https://img.shields.io/badge/rust-1.82%2B-orange.svg)](https://www.rust-lang.org)
+[![Local-first](https://img.shields.io/badge/local--first-no%20telemetry-brightgreen.svg)](#design-invariants)
 
-## Status
+</div>
 
-**v0 MVP complete** — a real engagement runs end-to-end inside Mycroft, recon to report
-(see [docs/ROADMAP.md](docs/ROADMAP.md)). 46 tests; `fmt` + `clippy -D warnings` clean.
+Mycroft replaces the usual engagement chaos — 12 terminals, a notes file, a screenshots
+folder, and a findings spreadsheet — with **one terminal-native console**. Define your
+scope once and Mycroft guards it. Run every tool *through* Mycroft and every command is
+scope-checked, logged, timestamped, and its output captured as hashed evidence. All of it
+normalizes into a single findings database, and one command turns that into a client-ready
+report with an evidence appendix.
 
-| Phase | Unit | State |
-|---|---|---|
-| 0 | Workspace, schema, migrations, audit chain, `init` | ✅ done, tested |
-| 1 | Scope manager + **guard** (parse / resolve / check) | ✅ done, tested |
-| 2 | Command runner (guarded exec, capture, persist) + TUI runner pane | ✅ done, tested |
-| 3 | Parsers (nmap, nuclei) → findings + `import` + auto-normalize on run | ✅ done, tested |
-| 4 | Report (Markdown / HTML / typst → PDF) + evidence appendix | ✅ done, tested |
+**Local-first by design:** client data never leaves the box. No telemetry, no phone-home.
+
+---
+
+## Highlights
+
+- 🛡️ **Scope guard you can't accidentally bypass.** Every command — human *or* AI-issued —
+  is checked before it touches the network. Default-deny, exclusions win, DNS-rebind aware
+  (a host that resolves into an excluded network is blocked), and it fails closed.
+- 🧾 **Everything is logged.** Executions *and* blocked attempts are persisted with target,
+  args, exit code, timing, and captured stdout/stderr — deconfliction and an audit trail for free.
+- 🔗 **Tamper-evident audit chain.** A hash-chained log means editing or deleting any
+  recorded action is detectable with `mycroft verify` — defensible chain-of-custody.
+- 🧩 **One findings model.** nmap and nuclei output normalize into the same database; run a
+  tool through Mycroft and findings appear automatically, linked to the command that produced them.
+- 📎 **Evidence that attaches itself.** Output is content-addressed by SHA-256 and linked to
+  its finding and command.
+- 📄 **One-command reporting.** Markdown + self-contained HTML + typst source (and PDF when
+  `typst` is present), with a severity summary, command log, and evidence appendix.
+- 🔒 **Encryption at rest** (SQLCipher, opt-in) and a single portable SQLite file per engagement.
+- 🖥️ **Two ways to drive it:** a scriptable CLI (`mycroft run -- …`) and an interactive
+  ratatui **runner pane** — both on the identical guarded path.
+
+## Demo
+
+The quickstart below is scripted as a [VHS](https://github.com/charmbracelet/vhs) tape at
+[`docs/demo.tape`](docs/demo.tape). Run `vhs docs/demo.tape` to generate `docs/demo.gif`.
 
 ## Install
 
 Mycroft is a single ~4 MB binary (`mycroft`). It's an **orchestrator** — it runs your
 existing tools (`nmap`, `nuclei`, …) *through* its guard and logger, so install those
-separately for whatever you want to scan. `typst` is optional (for PDF reports).
+separately for whatever you scan. `typst` is optional, for PDF reports.
+
+**From source** (needs a recent [Rust](https://rustup.rs) toolchain — works today):
 
 ```sh
-# 1. One-line installer — prebuilt binary from the latest GitHub Release (macOS/Linux)
+cargo install --git https://github.com/tejgokani/MYCROFT mycroft
+# or clone and build
+git clone https://github.com/tejgokani/MYCROFT && cd MYCROFT && cargo build --release
+```
+
+**Prebuilt binaries & package managers** (from the first tagged release):
+
+```sh
+# One-line installer (macOS / Linux) — downloads + checksum-verifies a prebuilt binary
 curl --proto '=https' --tlsv1.2 -LsSf \
   https://raw.githubusercontent.com/tejgokani/MYCROFT/main/install.sh | sh
 
-# 2. Homebrew (once a release + tap exist)
-brew install tejgokani/mycroft/mycroft
-
-# 3. From crates.io (Rust users; once published)
-cargo install mycroft
-
-# 4. From the repo with cargo — works today, no release needed (needs Rust)
-cargo install --git https://github.com/tejgokani/MYCROFT mycroft
-
-# 5. Prebuilt binaries: grab a tarball/zip from
-#    https://github.com/tejgokani/MYCROFT/releases  (macOS arm64/x64, Linux, Windows)
-
-# 6. Build from source
-git clone https://github.com/tejgokani/MYCROFT && cd MYCROFT
-cargo build --release        # -> target/release/mycroft
+brew install tejgokani/mycroft/mycroft   # Homebrew
+cargo install mycroft                     # crates.io
 ```
 
-Releases and publishing are automated/documented in [docs/RELEASING.md](docs/RELEASING.md).
+Prebuilt archives for macOS (arm64/x64), Linux (x64/arm64), and Windows are attached to
+each [release](https://github.com/tejgokani/MYCROFT/releases). See
+[docs/RELEASING.md](docs/RELEASING.md) for how releases are cut.
 
-## Demo
+## Quickstart
 
-A 30-second quickstart (below) is scripted as a [VHS](https://github.com/charmbracelet/vhs)
-tape at [`docs/demo.tape`](docs/demo.tape) — run `vhs docs/demo.tape` to regenerate
-`docs/demo.gif`, then embed it here.
+```sh
+# 1. Start an engagement (creates ./mycroft.db + a genesis audit entry)
+mycroft init --name acme-q3 --client "ACME Corp"
 
-## Design invariants (non-negotiable)
+# 2. Define scope once. Exclusions ("out") always win over inclusions.
+mycroft scope add 10.0.0.0/24 --type cidr
+mycroft scope add 10.0.0.53   --kind out --type cidr
+mycroft scope check 10.0.0.10          # ALLOW   (dry-run verdict)
+mycroft scope check 10.0.0.53          # BLOCK   (excluded)
+
+# 3. Run tools THROUGH Mycroft: guard-checked, logged, output captured & normalized.
+mycroft run --target 10.0.0.5 -- nmap -sV -oX - 10.0.0.5
+mycroft run --target 8.8.8.8  -- curl https://8.8.8.8    # BLOCKED (exit 3) — never runs
+
+# 4. Or ingest scans you already have.
+mycroft import --tool nuclei findings.jsonl
+
+# 5. Review, report, and verify the audit trail.
+mycroft findings          # most severe first, every tool in one view
+mycroft report            # Markdown + HTML + typst (+ PDF if typst is installed)
+mycroft verify            # is the tamper-evident audit chain intact?
+
+# Prefer it interactive?
+mycroft tui               # runner pane: scope + history live, same guarded path
+```
+
+## How it works
+
+Every command follows exactly one path — there is no alternate route, and AI Mode (v1)
+will inherit it unchanged:
+
+```
+issue command ─▶ Scope Guard ─▶ (block → logged attempt, no network)
+                     │
+                     └▶ allow ─▶ Runner (arg-vector exec, no shell)
+                                    │  live output ─▶ terminal / TUI pane
+                                    └▶ capture ─▶ sha256 evidence ─▶ SQLite
+                                                    │
+                                                    └▶ Normalizer ─▶ findings
+```
+
+The scope guard is a **pure function** over a *resolved* target, kept deliberately small and
+exhaustively tested, with resolution (DNS) as a separate security-critical step in front of
+it. The findings database is the single source of truth; the reporter is read-only over it
+and re-verifies the audit chain so a reader can trust the output.
+
+## Architecture
+
+A Cargo workspace of eight small, single-purpose crates, each coding to shared contracts in
+`mycroft-core`:
+
+```
+mycroft-core       shared domain types + error taxonomy (the contract surface)
+mycroft-store      SQLite: schema, migrations, typed repos, audit chain, encryption seam
+mycroft-guard      scope parse + resolve + check          [security-critical]
+mycroft-runner     guarded exec, capture, sha256 evidence, persistence
+mycroft-normalize  tool output → findings (nmap, nuclei)
+mycroft-report     SQLite → Markdown / HTML / typst → PDF + evidence appendix
+mycroft-tui        ratatui runner pane (scope · runner · history)
+mycroft            the CLI binary
+```
+
+More detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); every non-trivial decision is
+logged in [docs/DECISIONS.md](docs/DECISIONS.md).
+
+## Design invariants
+
+These four properties are non-negotiable; the codebase and its tests are built to enforce them:
 
 1. **No command reaches the network without passing the scope guard** — including AI-issued ones.
 2. **Every command attempt is persisted** — executions *and* blocks, with full context.
 3. **The findings model is the source of truth** — everything normalizes into it.
-4. **Local-first** — no telemetry, no phone-home.
+4. **Local-first** — no telemetry, no network call that sends engagement data off-box.
 
-The engagement DB additionally carries a **tamper-evident, hash-chained audit log**
-(`mycroft verify`) and supports **encryption at rest** (SQLCipher, opt-in).
+## Roadmap
 
-## Architecture
+Mycroft's core (define scope → run guarded → normalize → report) is complete and tested
+(eight crates, 46 tests, `fmt` + `clippy -D warnings` clean). What's next:
 
-A Cargo workspace of small, single-purpose crates, each coding to shared contracts in
-`mycroft-core`:
+**Shipping v0.1 (operational)**
+- [ ] Cut the first tagged release (publishes prebuilt binaries; enables `curl | sh`)
+- [ ] Publish to crates.io (`cargo install mycroft`)
+- [ ] Create the Homebrew tap and fill in per-release checksums
+- [ ] Record and embed the demo GIF
 
-```
-mycroft-core       shared domain types + errors (the contract surface)
-mycroft-store      SQLite: schema, migrations, typed repos, audit chain, encryption seam
-mycroft-guard      scope parse + resolve + check   [SECURITY-CRITICAL]
-mycroft-runner     guarded exec, dual capture (machine output + PTY), persistence   (Phase 2)
-mycroft-normalize  tool output -> findings (nmap, nuclei)                            (Phase 3)
-mycroft-report     SQLite -> typst -> PDF + evidence appendix                        (Phase 4)
-mycroft-tui        ratatui panes (scope / runner / findings)                         (Phase 2+)
-mycroft-cli        the `mycroft` binary
-```
+**v1 — differentiators**
+- [ ] Recon orchestration chain (subdomains → resolve → ports → http → nuclei)
+- [ ] **AI Mode** — a local LLM assistant (Ollama wrapper) that proposes commands through
+      the same guard + logger; propose-then-approve by default (see [docs/AI_MODE.md](docs/AI_MODE.md))
+- [ ] More parsers: httpx, ffuf, nessus, burp
+- [ ] Correlation / attack-narrative view (web dashboard over the same SQLite)
+- [ ] True PTY capture for tools that alter behavior on a tty
+- [ ] Embedded typst compiler for single-binary PDF (no external `typst` needed)
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and the decision log in
-[docs/DECISIONS.md](docs/DECISIONS.md).
+**v2 — team & scale**
+- [ ] Multi-operator engagements (server-backed)
+- [ ] Live deconfliction feed for blue teams
+- [ ] Report templates per client / framework (OWASP, PTES)
 
-## Try it (what works today)
+## Contributing
 
-```sh
-cargo build
-BIN=target/debug/mycroft
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). In short: `cargo fmt`,
+`cargo clippy -- -D warnings`, and `cargo test --workspace` must be clean, changes stay small
+and reviewable, and anything touching the guard, runner, or audit log gets extra scrutiny.
 
-# Start an engagement (creates ./mycroft.db + genesis audit entry)
-$BIN init --name acme-external --client "ACME Corp"
+## Security
 
-# Define scope. Exclusions ("out") always win over inclusions.
-$BIN scope add 10.0.0.0/24  --type cidr
-$BIN scope add '*.acme.com'  --type domain
-$BIN scope add 10.0.0.53      --kind out --type cidr
-
-# Ask the guard for a verdict (dry-run; nothing is executed)
-$BIN scope check 10.0.0.10        # ALLOW
-$BIN scope check 10.0.0.53        # BLOCK  (excluded)
-$BIN scope check 192.168.1.1      # BLOCK  (default deny)
-
-# Run a tool THROUGH Mycroft: guard-checked, logged, output captured as evidence.
-# In-scope -> executes and captures; out-of-scope -> hard-blocked, never runs.
-$BIN scope add 127.0.0.0/8 --type cidr
-$BIN run --target 127.0.0.1 -- nmap -sV 127.0.0.1
-$BIN run --target 8.8.8.8   -- curl https://8.8.8.8   # BLOCKED (exit 3), never executes
-
-# Output from a recognized tool (nmap -oX, nuclei -jsonl) auto-normalizes into
-# findings, linked to the command that produced them. You can also import files:
-$BIN import --tool nmap   scan.xml
-$BIN import --tool nuclei findings.jsonl
-$BIN findings                      # most severe first, all tools in one view
-
-# See recorded commands (executions + blocked attempts), then the audit trail
-$BIN commands
-$BIN status
-$BIN verify
-
-# One client-ready report: Markdown + self-contained HTML + typst source (+ PDF if
-# `typst` is installed), with a severity summary, command log, and evidence appendix.
-$BIN report
-
-# Or drive it interactively — the runner pane routes typed commands through the
-# identical guarded path, with scope + history live alongside:
-$BIN tui
-```
-
-The guard defends against DNS-rebind: a host that is in scope by name but currently resolves
-into an excluded network is blocked. It fails closed — a name that cannot be resolved is
-blocked, never allowed.
-
-## Development
-
-```sh
-cargo fmt --all --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
-```
-
-Both must be clean before any integration. The guard is the highest-risk unit and carries an
-adversarial test suite (DNS-rebind, exclusion precedence, default-deny, IPv6, malformed rules).
+Mycroft is offensive-security tooling for **authorized** engagements only. To report a
+vulnerability, see [SECURITY.md](SECURITY.md) — please do not open a public issue.
 
 ## License
 
-Apache-2.0.
+[Apache-2.0](LICENSE).
