@@ -40,7 +40,9 @@ jobs:
           - target: aarch64-apple-darwin
             os: macos-latest
           - target: x86_64-apple-darwin
-            os: macos-13
+            # Cross-compiled on the arm64 runner; the scarce macos-13 Intel runners
+            # can queue for hours, so we don't depend on them.
+            os: macos-latest
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
           - target: x86_64-unknown-linux-musl

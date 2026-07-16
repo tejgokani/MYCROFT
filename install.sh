@@ -64,7 +64,9 @@ download "${base}/${archive}" "${tmp}/${archive}" \
   || err "download failed - no prebuilt binary for ${target}? try building from source"
 
 # --- verify checksum (best-effort but preferred) -----------------------------
-if download "${base}/${archive}.sha256" "${tmp}/${archive}.sha256" 2>/dev/null; then
+# Release checksum files are named mycroft-<target>.sha256 (their contents still
+# reference the .tar.gz), so download that but keep the local name aligned to the archive.
+if download "${base}/${BIN}-${target}.sha256" "${tmp}/${archive}.sha256" 2>/dev/null; then
   ( cd "$tmp"
     if command -v sha256sum >/dev/null 2>&1; then
       sha256sum -c "${archive}.sha256" >/dev/null 2>&1 || err "checksum verification FAILED"
