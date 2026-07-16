@@ -1,6 +1,9 @@
 [package]
 name = "mycroft-store"
-version.workspace = true
+# 0.1.0 shipped with an out-of-crate migration include that can't build from crates.io;
+# 0.1.1 embeds the migration file inside the crate. Other crates pin `^0.1.0`, so they
+# transparently pick up this fix.
+version = "0.1.1"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true

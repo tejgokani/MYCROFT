@@ -9,7 +9,7 @@ use rusqlite::Connection;
 use crate::error::Result;
 
 /// (schema_version, sql). Ordered ascending. Append new migrations; never edit shipped ones.
-const MIGRATIONS: &[(i32, &str)] = &[(1, include_str!("../../../migrations/0001_init.sql"))];
+const MIGRATIONS: &[(i32, &str)] = &[(1, include_str!("../migrations/0001_init.sql"))];
 
 /// The schema version this build expects.
 pub const CURRENT_VERSION: i32 = 1;
