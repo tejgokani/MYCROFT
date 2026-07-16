@@ -1,0 +1,58 @@
+name: release
+
+# Tag a version to cut a release:
+#   git tag v0.1.0 && git push origin v0.1.0
+# This builds the `mycroft` binary for every target below and attaches the archives
+# (with SHA-256 checksums) to a GitHub Release for the tag.
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.*"
+
+permissions:
+  contents: write # required to create the release and upload assets
+
+jobs:
+  build:
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: x86_64-apple-darwin
+            os: macos-13
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      # Builds `mycroft` for the target, packages it (tar.gz on unix, zip on Windows),
+      # writes a .sha256 checksum, and uploads everything to the release for this tag.
+      # Cross-compilation targets (musl, aarch64-linux) are built via `cross` automatically.
+      - name: Build and upload binary
+        uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: mycroft
+          target: ${{ matrix.target }}
+          # Stable, version-less asset names so the installer can fetch
+          # /releases/latest/download/mycroft-<target>.{tar.gz,zip}
+          archive: mycroft-$target
+          checksum: sha256
+          # Nice-to-have context files inside the archive.
+          include: LICENSE,README.md
+          token: ${{ secrets.GITHUB_TOKEN }}

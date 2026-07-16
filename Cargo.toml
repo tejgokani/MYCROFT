@@ -16,18 +16,21 @@ version = "0.0.1"
 edition = "2021"
 rust-version = "1.82"
 license = "Apache-2.0"
-repository = "https://github.com/mycroft-sec/mycroft"
+repository = "https://github.com/tejgokani/MYCROFT"
+homepage = "https://github.com/tejgokani/MYCROFT"
 authors = ["Mycroft contributors"]
+keywords = ["pentest", "security", "vapt", "recon", "tui"]
+categories = ["command-line-utilities"]
 
 [workspace.dependencies]
-# Internal crates
-mycroft-core = { path = "crates/mycroft-core" }
-mycroft-store = { path = "crates/mycroft-store" }
-mycroft-guard = { path = "crates/mycroft-guard" }
-mycroft-runner = { path = "crates/mycroft-runner" }
-mycroft-normalize = { path = "crates/mycroft-normalize" }
-mycroft-report = { path = "crates/mycroft-report" }
-mycroft-tui = { path = "crates/mycroft-tui" }
+# Internal crates (path for local builds; version required so they are publishable to crates.io)
+mycroft-core = { path = "crates/mycroft-core", version = "0.0.1" }
+mycroft-store = { path = "crates/mycroft-store", version = "0.0.1" }
+mycroft-guard = { path = "crates/mycroft-guard", version = "0.0.1" }
+mycroft-runner = { path = "crates/mycroft-runner", version = "0.0.1" }
+mycroft-normalize = { path = "crates/mycroft-normalize", version = "0.0.1" }
+mycroft-report = { path = "crates/mycroft-report", version = "0.0.1" }
+mycroft-tui = { path = "crates/mycroft-tui", version = "0.0.1" }
 
 # Shared external deps (pinned at workspace level; see docs/DECISIONS.md for rationale)
 anyhow = "1"

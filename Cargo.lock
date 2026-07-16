@@ -567,7 +567,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mycroft-cli"
+name = "mycroft"
 version = "0.0.1"
 dependencies = [
  "anyhow",

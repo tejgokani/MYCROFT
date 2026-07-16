@@ -20,6 +20,42 @@ client-ready report with an evidence appendix. Local-first: client data never le
 | 3 | Parsers (nmap, nuclei) → findings + `import` + auto-normalize on run | ✅ done, tested |
 | 4 | Report (Markdown / HTML / typst → PDF) + evidence appendix | ✅ done, tested |
 
+## Install
+
+Mycroft is a single ~4 MB binary (`mycroft`). It's an **orchestrator** — it runs your
+existing tools (`nmap`, `nuclei`, …) *through* its guard and logger, so install those
+separately for whatever you want to scan. `typst` is optional (for PDF reports).
+
+```sh
+# 1. One-line installer — prebuilt binary from the latest GitHub Release (macOS/Linux)
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://raw.githubusercontent.com/tejgokani/MYCROFT/main/install.sh | sh
+
+# 2. Homebrew (once a release + tap exist)
+brew install tejgokani/mycroft/mycroft
+
+# 3. From crates.io (Rust users; once published)
+cargo install mycroft
+
+# 4. From the repo with cargo — works today, no release needed (needs Rust)
+cargo install --git https://github.com/tejgokani/MYCROFT mycroft
+
+# 5. Prebuilt binaries: grab a tarball/zip from
+#    https://github.com/tejgokani/MYCROFT/releases  (macOS arm64/x64, Linux, Windows)
+
+# 6. Build from source
+git clone https://github.com/tejgokani/MYCROFT && cd MYCROFT
+cargo build --release        # -> target/release/mycroft
+```
+
+Releases and publishing are automated/documented in [docs/RELEASING.md](docs/RELEASING.md).
+
+## Demo
+
+A 30-second quickstart (below) is scripted as a [VHS](https://github.com/charmbracelet/vhs)
+tape at [`docs/demo.tape`](docs/demo.tape) — run `vhs docs/demo.tape` to regenerate
+`docs/demo.gif`, then embed it here.
+
 ## Design invariants (non-negotiable)
 
 1. **No command reaches the network without passing the scope guard** — including AI-issued ones.
